@@ -1,0 +1,20 @@
+# data (copied to the cluster separately)
+master_datasets/
+*.parquet
+*.zarr/
+*.nc
+*.csv
+
+# model outputs
+runs/
+*.pt
+
+# logs
+*.txt
+*.log
+
+# other
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

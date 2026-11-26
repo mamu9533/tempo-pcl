@@ -1,0 +1,24 @@
+name: pcl
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas>=2.2
+  - pyarrow
+  - xarray
+  - zarr<3
+  - dask
+  - netcdf4
+  - cftime
+  - scipy
+  - scikit-learn
+  - xgboost
+  - optuna
+  - matplotlib
+  - joblib
+  - tqdm
+  - ipykernel
+  - pip
+  - pip:
+      - torch          # Linux pip wheels ship with CUDA built in
