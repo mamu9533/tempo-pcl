@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 import torch
-from torch.utils.data import TensorDataset, DataLoader
+from torch.utils.data import TensorDataset, DataLoader, BatchSampler, RandomSampler
 from sklearn.cluster import AgglomerativeClustering
 
 # Fixed transforms, applied right after loading (same formula for every row, no stats needed).
@@ -292,7 +292,8 @@ class PCLDataModule:
             x_loc = torch.tensor(table[self.loc_cols].values, dtype=torch.float32)
             y     = torch.tensor(table[self.config["TARG_VAR"]].values, dtype=torch.float32)
             idx   = torch.arange(len(table))
-            loader = DataLoader(TensorDataset(x_obs, x_loc, y, idx), batch_size=batch_size, shuffle=True)
+            ds = TensorDataset(x_obs, x_loc, y, idx)
+            loader = DataLoader(ds, sampler=BatchSampler(RandomSampler(ds), batch_size=batch_size, drop_last=False), batch_size=None)
 
             return loader
 
@@ -312,7 +313,8 @@ class PCLDataModule:
             for name, table in self.proxy_tables.items():
                 x = torch.tensor(table[self.loc_cols].values, dtype=torch.float32)
                 y = torch.tensor(table["vertical_column_troposphere"].values, dtype=torch.float32)
-                data_loaders["proxy"][name] = DataLoader(TensorDataset(x, y), batch_size=proxy_batch_size, shuffle=True)
+                ds = TensorDataset(x, y)
+                data_loaders["proxy"][name] = DataLoader(ds, sampler=BatchSampler(RandomSampler(ds), batch_size=proxy_batch_size, drop_last=False), batch_size=None)
 
         return data_loaders
 
