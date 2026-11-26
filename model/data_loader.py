@@ -56,7 +56,7 @@ class PCLDataModule:
         self.training_columns = [self.config['TARG_VAR']] + self.config['OBS_VARS'] \
                                  + self.config['LOC_VARS'] + ['site', 'time']
 
-        training_table = pd.read_parquet(rf"..\master_datasets\training_tables\{self.config['TARG_VAR']}.parquet", \
+        training_table = pd.read_parquet(rf"../master_datasets/training_tables/{self.config['TARG_VAR']}.parquet", \
                                          columns=self.training_columns)
 
         self.training_table = training_table.dropna().reset_index(drop=True)
@@ -79,7 +79,7 @@ class PCLDataModule:
         if self.config['PCL_VARS'] is not None:
             self.proxy_tables = {f"{var}": None for var in self.config['PCL_VARS']}
             for var in self.config['PCL_VARS']:
-                self.proxy_tables[var] = pd.read_parquet(rf"..\master_datasets\proxy_tables\{var}.parquet")
+                self.proxy_tables[var] = pd.read_parquet(rf"../master_datasets/proxy_tables/{var}.parquet")
                 self.proxy_tables[var] = self.proxy_tables[var].dropna().reset_index(drop=True)
                 if var in PROXY_TRANSFORMS:
                     col = "vertical_column_troposphere"
@@ -234,7 +234,7 @@ class PCLDataModule:
 
                 return sites[["site", "k"]]
             
-            site_folds = add_fold_ids(pd.read_parquet(rf"..\master_datasets\training_tables\{self.config['TARG_VAR']}.parquet", \
+            site_folds = add_fold_ids(pd.read_parquet(rf"../master_datasets/training_tables/{self.config['TARG_VAR']}.parquet", \
                                          columns=self.training_columns))
 
             self.training_table = self.training_table.merge(site_folds, how='left', on='site')
@@ -285,6 +285,7 @@ class PCLDataModule:
     def dataloaders(self):
         """C) Wrap train/val site rows and proxy rows in PyTorch DataLoaders."""
         batch_size = self.config["TRAIN"]["BATCH_SIZE"]
+        proxy_batch_size = self.config["TRAIN"]["PROXY_BATCH_SIZE"]
 
         def train_test_loaders(table):
             x_obs = torch.tensor(table[self.obs_cols].values, dtype=torch.float32)
@@ -311,7 +312,7 @@ class PCLDataModule:
             for name, table in self.proxy_tables.items():
                 x = torch.tensor(table[self.loc_cols].values, dtype=torch.float32)
                 y = torch.tensor(table["vertical_column_troposphere"].values, dtype=torch.float32)
-                data_loaders["proxy"][name] = DataLoader(TensorDataset(x, y), batch_size=batch_size, shuffle=True)
+                data_loaders["proxy"][name] = DataLoader(TensorDataset(x, y), batch_size=proxy_batch_size, shuffle=True)
 
         return data_loaders
 
