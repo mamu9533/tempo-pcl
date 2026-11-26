@@ -27,7 +27,7 @@ CONFIG = {
     "LAMBDAS": {"O3": 0, "RATIO":0},
 
     # ---- training (small, for a quick check) ----
-    "TRAIN": {"LR": 1e-3, "BATCH_SIZE": 1024, "EPOCHS": 200, 
+    "TRAIN": {"LR": 1e-3, "BATCH_SIZE": 1024, "PROXY_BATCH_SIZE": 4096, "EPOCHS": 200, 
               "PATIENCE": 10, "LR_FACTOR": 0.5, "LR_PATIENCE": 3},
 }
 
