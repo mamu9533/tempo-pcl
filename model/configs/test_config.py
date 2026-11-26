@@ -27,7 +27,8 @@ CONFIG = {
     "LAMBDAS": {"O3": 0, "RATIO":0},
 
     # ---- training (small, for a quick check) ----
-    "TRAIN": {"LR": 1e-3, "BATCH_SIZE": 1024, "EPOCHS": 200, "PATIENCE": 10},
+    "TRAIN": {"LR": 1e-3, "BATCH_SIZE": 1024, "EPOCHS": 200, 
+              "PATIENCE": 10, "LR_FACTOR": 0.5, "LR_PATIENCE": 3},
 }
 
 assert set(CONFIG["PCL_VARS"] or []) == set(CONFIG["LAMBDAS"]), "PCL_VARS and LAMBDAS keys must match"
