@@ -109,6 +109,7 @@ def train(config, run_dir=None):
     model.to(device)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=config["TRAIN"]["LR"])
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=config["TRAIN"]["LR_FACTOR"], patience=config["TRAIN"]["LR_PATIENCE"])
 
     iterators = {name: iter(loaders['proxy'][name]) for name in loaders['proxy'].keys()}
 
@@ -119,10 +120,12 @@ def train(config, run_dir=None):
         avg_losses = train_one_epoch(model, loaders, iterators, optimizer, config['LAMBDAS'] or {})
 
         metrics, _, _ = evaluate(model, loaders['test'], data.table_train_stats[config['TARG_VAR']])
+        scheduler.step(metrics["val_loss"])
 
         proxy_str = "".join(f" | {name} {avg_losses[name]:.4f}" for name in (config["LAMBDAS"] or {}))
         print(f"epoch {epoch + 1:>3} | train site {avg_losses['site']:.4f}{proxy_str} | "
-              f"val loss {metrics['val_loss']:.4f} | RMSE {metrics['RMSE']:.2f} ppb | R2 {metrics['R2']:.3f}")
+              f"val loss {metrics['val_loss']:.4f} | RMSE {metrics['RMSE']:.2f} ppb | R2 {metrics['R2']:.3f} | "
+              f"lr {optimizer.param_groups[0]['lr']:.1e}")
 
         if epoch == 0:
             best_val_loss = metrics['val_loss']
