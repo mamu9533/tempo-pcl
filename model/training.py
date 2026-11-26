@@ -117,6 +117,7 @@ def train(config, run_dir=None):
 
     counter = 0
     for epoch in range(max_epochs):
+        t0 = time.time()
         avg_losses = train_one_epoch(model, loaders, iterators, optimizer, config['LAMBDAS'] or {})
 
         metrics, _, _ = evaluate(model, loaders['test'], data.table_train_stats[config['TARG_VAR']])
@@ -125,7 +126,7 @@ def train(config, run_dir=None):
         proxy_str = "".join(f" | {name} {avg_losses[name]:.4f}" for name in (config["LAMBDAS"] or {}))
         print(f"epoch {epoch + 1:>3} | train site {avg_losses['site']:.4f}{proxy_str} | "
               f"val loss {metrics['val_loss']:.4f} | RMSE {metrics['RMSE']:.2f} ppb | R2 {metrics['R2']:.3f} | "
-              f"lr {optimizer.param_groups[0]['lr']:.1e}")
+              f"lr {optimizer.param_groups[0]['lr']:.1e} | {time.time() - t0:.0f} s")
 
         if epoch == 0:
             best_val_loss = metrics['val_loss']
