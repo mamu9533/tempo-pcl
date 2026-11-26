@@ -7,7 +7,7 @@ dependencies:
   - pandas>=2.2
   - pyarrow
   - xarray
-  - zarr<3
+  - zarr>=3
   - dask
   - netcdf4
   - cftime
